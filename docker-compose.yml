@@ -1,5 +1,7 @@
 # Weather-LSTM-MLSecOps/docker-compose.yml
 
+version: "3.9"
+
 x-build-common: &build-common
   args:
     PYTHONUNBUFFERED: "1"
@@ -53,7 +55,7 @@ services:
     env_file: .env
     environment:
       - PYTHONPATH=/app/src
-    working_dir: /app/src
+    working_dir: /app
     depends_on:
       mlflow:
         condition: service_started
@@ -62,13 +64,32 @@ services:
     restart: unless-stopped
     volumes:
       - .:/app
-    command: streamlit run src/monitor/monitor.py
+    command: streamlit run src/monitor/monitor.py --server.address=0.0.0.0 --server.port=8501
+
+  airflow-init:
+    build:
+      context: .
+      dockerfile: docker/airflow/Dockerfile
+    entrypoint: bash -c "airflow db migrate && airflow db upgrade"
+    environment:
+      - PYTHONPATH=/app
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////usr/local/airflow/airflow.db
+    volumes:
+      - .:/app
+      - ./airflow/db:/usr/local/airflow
+    depends_on:
+      - mlflow
 
   airflow:
-    image: apache/airflow:2.8.1-python3.9
+    build:
+      context: .
+      dockerfile: docker/airflow/Dockerfile
     environment:
+      - PYTHONPATH=/app
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////usr/local/airflow/airflow.db
       - AIRFLOW__WEBSERVER__SECRET_KEY=your-secret-key
       - AIRFLOW__WEBSERVER__RBAC=True
@@ -79,16 +100,16 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - .:/app
+      - ./airflow/db:/usr/local/airflow
     command: >
-      bash -c "airflow db upgrade &&
-               airflow users create --username admin --password admin --firstname Tomi --lastname Teszt --role Admin --email admin@admin.local &&
+      bash -c "airflow users create --username admin --password admin --firstname Tomi --lastname Teszt --role Admin --email admin@admin.local &&
                airflow scheduler & airflow webserver"
     depends_on:
-      - mlflow
+      - airflow-init
 
   notebook:
     build:
-      context: .
+      context: . 
       dockerfile: docker/api/Dockerfile
       <<: *build-common
     env_file: .env
