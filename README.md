@@ -117,7 +117,7 @@ MIT License. Használd, forgasd, forkold bátran!
 
 ## 👨‍💻 Fejlesztő
 
-**Tomi Panyi**  
+**Panyi Tamás**  
 MSc Data Science – Óbudai Egyetem  
 [GitHub](https://github.com/alenoi)
 
