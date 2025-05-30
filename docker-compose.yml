@@ -38,6 +38,24 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
     ports:
       - '8085:8080'
+  notebook:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile   
+    env_file: .env
+    depends_on:
+      - mlflow
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/home/jovyan/work            #
+    command: >
+      /opt/conda/bin/conda run -n mlsecops
+      jupyter notebook --ip=0.0.0.0 --no-browser --allow-root --NotebookApp.token=''
+
 
 volumes:
   mlflow_artifacts:
+
+
+

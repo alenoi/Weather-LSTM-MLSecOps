@@ -28,7 +28,14 @@ RUN apt-get update && \
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 RUN conda install -y -c conda-forge google-re2
 COPY requirements.txt ./
-RUN pip install -r requirements.txt
+# Első-layer: alapkönyvtárak
+RUN pip install --no-cache-dir fastapi uvicorn pandas scikit-learn
+# Második-layer: ML-stack
+RUN pip install --no-cache-dir torch torchvision mlflow
+# Harmadik-layer: vizualizáció + monitor
+RUN pip install --no-cache-dir matplotlib seaborn streamlit evidently
+# Negyedik-layer: infra
+RUN pip install --no-cache-dir apache-airflow python-dotenv requests email-validator geopy meteostat
 
 # 7) Forráskód másolása és munkakönyvtár beállítása
 COPY src/api /app/src/api
