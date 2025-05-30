@@ -1,6 +1,5 @@
 # Weather-LSTM-MLSecOps/docker-compose.yml
 
-# Build‐common anchor root szinten
 x-build-common: &build-common
   args:
     PYTHONUNBUFFERED: "1"
@@ -28,6 +27,9 @@ services:
       dockerfile: docker/api/Dockerfile
       <<: *build-common
     env_file: .env
+    environment:
+      - PYTHONPATH=/app/src
+    working_dir: /app/src
     depends_on:
       mlflow:
         condition: service_healthy
@@ -39,6 +41,9 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    volumes:
+      - .:/app
+    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8080 --reload
 
   monitor:
     build:
@@ -46,24 +51,40 @@ services:
       dockerfile: docker/monitor/Dockerfile
       <<: *build-common
     env_file: .env
+    environment:
+      - PYTHONPATH=/app/src
+    working_dir: /app/src
     depends_on:
       mlflow:
         condition: service_started
     ports:
       - 8501:8501
     restart: unless-stopped
-
+    volumes:
+      - .:/app
+    command: streamlit run src/monitor/monitor.py
 
   airflow:
-    image: apache/airflow:2.5.0
+    image: apache/airflow:2.8.1-python3.9
     environment:
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////usr/local/airflow/airflow.db
+      - AIRFLOW__WEBSERVER__SECRET_KEY=your-secret-key
+      - AIRFLOW__WEBSERVER__RBAC=True
+      - AIRFLOW__CORE__FERNET_KEY=your-fernet-key
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=False
+    ports:
+      - "8085:8080"
     volumes:
       - ./airflow/dags:/opt/airflow/dags
-    ports:
-      - 8085:8080
-    restart: unless-stopped
-    command: ["airflow", "standalone"]
+      - .:/app
+    command: >
+      bash -c "airflow db upgrade &&
+               airflow users create --username admin --password admin --firstname Tomi --lastname Teszt --role Admin --email admin@admin.local &&
+               airflow scheduler & airflow webserver"
+    depends_on:
+      - mlflow
 
   notebook:
     build:
@@ -77,7 +98,7 @@ services:
     ports:
       - 8888:8888
     volumes:
-      - ./:/home/jovyan/work
+      - .:/home/jovyan/work
     command: >
       conda run -n mlsecops jupyter notebook
       --ip=0.0.0.0 --no-browser --allow-root --NotebookApp.token=''
