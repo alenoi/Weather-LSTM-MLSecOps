@@ -2,6 +2,13 @@ fastapi
 uvicorn
 pandas
 torch
+torchvision
+torchaudio
+scikit-learn
+meteostat
+geopy
+matplotlib
+seaborn
 mlflow
 streamlit
 evidently

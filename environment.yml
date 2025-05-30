@@ -6,10 +6,15 @@ dependencies:
     - fastapi
     - uvicorn
     - pandas
-    - torch
+    - scikit-learn
+    - meteostat
+    - geopy
+    - matplotlib
+    - seaborn
     - mlflow
     - streamlit
     - evidently
     - apache-airflow
     - python-dotenv
     - requests
+    - email-validator
