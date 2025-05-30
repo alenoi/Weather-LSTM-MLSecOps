@@ -66,7 +66,7 @@ A Streamlit alkalmazás vizuálisan megjeleníti:
 
 ## 🛰️ Airflow pipeline
 
-A `retrain_pipeline.py` fájlban található DAG automatikusan:
+A `train_pipeline_dag.py` fájlban található DAG automatikusan:
 
 1. Betölti az új adatokat  
 2. Előfeldolgozást végez  
@@ -81,7 +81,7 @@ Az EvidentlyAI segítségével folyamatosan monitorozzuk az input adatok eloszl�
 
 ## 📜 Követelmények
 
-Ha nem Dockerben futtatnád:
+Docker-en kívül:
 
 ```bash
 pip install -r requirements.txt
