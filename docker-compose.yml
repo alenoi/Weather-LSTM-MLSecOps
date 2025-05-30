@@ -1,0 +1,43 @@
+# Weather-LSTM-MLSecOps/docker-compose.yml
+
+services:
+  mlflow:
+    build:
+      context: ./docker/mlflow
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
+    volumes:
+      - mlflow_artifacts:/mlflow/artifacts
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    env_file: .env
+    depends_on:
+      - mlflow
+    ports:
+      - '${API_PORT}:8080'
+
+  monitor:
+    build:
+      context: ./docker/monitor
+      dockerfile: Dockerfile
+    env_file: .env
+    depends_on:
+      - mlflow
+    ports:
+      - '8501:8501'
+
+  airflow:
+    image: apache/airflow:2.5.0
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    ports:
+      - '8085:8080'
+
+volumes:
+  mlflow_artifacts:

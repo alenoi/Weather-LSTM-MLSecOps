@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pandas
+torch
+mlflow
+streamlit
+evidently
+apache-airflow
+python-dotenv
+requests
+email-validator
