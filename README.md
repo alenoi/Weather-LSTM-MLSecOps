@@ -17,30 +17,6 @@ Egy gépi tanuláson alapuló időjárás-előrejelző rendszer, amely LSTM neur
 
 A modell egy többrétegű **LSTM (Long Short-Term Memory)** hálózat, amely múltbeli időjárási adatok alapján becsli meg a következő időlépés maximális hőmérsékletét.
 
-## 📁 Projektstruktúra
-
-```
-.
-├── docker/
-│   ├── api/
-│   ├── airflow/
-│   ├── mlflow/
-│   └── streamlit/
-├── notebooks/
-├── scripts/
-│   ├── train.py
-│   ├── preprocess.py
-│   └── predict.py
-├── dags/
-│   └── retrain_pipeline.py
-├── app/
-│   ├── main.py  # FastAPI app
-│   └── utils.py
-├── requirements.txt
-├── docker-compose.yml
-└── README.md
-```
-
 ## 🐳 Telepítés és futtatás
 
 ### 1. Klónozd a repót
