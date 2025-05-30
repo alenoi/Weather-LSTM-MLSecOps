@@ -26,6 +26,7 @@ with DAG(
         task_id="train_lstm_model",
         bash_command="python /app/src/train.py",
         env={
+            "PYTHONPATH": "/app",  # 👈 ez hiányzott
             "MLFLOW_TRACKING_URI": "http://mlflow:5000",
             # Egyéb környezeti változók, pl. batch_size, epochs, ha kell
         },

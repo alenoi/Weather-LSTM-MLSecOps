@@ -15,6 +15,9 @@ import mlflow.pytorch
 from src.model.lstm import LSTMModel
 from src.data.dataloader import create_dataloaders
 from src.utils.early_stopping import EarlyStopping
+import sys
+sys.path.append('/app')
+
 
 # --- Alapértelmezett konfiguráció ---
 DEFAULT_CONFIG = {
