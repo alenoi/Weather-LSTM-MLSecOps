@@ -105,4 +105,3 @@ MSc Data Science – Óbudai Egyetem
 
 - [ ] Hyperparameter tuning automatikusan (pl. Optuna integrációval)  
 - [ ] Értesítés emailben/SMS-ben drift esetén  
-- [ ] Streamlit sötét/világos mód váltás  
