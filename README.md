@@ -1,23 +1,23 @@
 # 🌦️ Weather-LSTM-MLSecOps
 
-Egy gépi tanuláson alapuló időjárás-előrejelző rendszer LSTM neurális hálózatokkal, amelyet modern MLOps eszközökkel támogatunk és teszünk újrataníthatóvá. A cél az időjárási adatok alapján történő hőmérséklet-előrejelzés, illetve az ehhez szükséges adatelőkészítés, tanítás, validálás és monitorozás teljes pipeline-jának kiépítése.
+Egy gépi tanuláson alapuló időjárás-előrejelző rendszer, amely LSTM neurális hálózatra épül, és modern MLOps eszközök segítségével valósítja meg az automatizált betanítást, verziókövetést és monitorozást. A cél: egy teljes pipeline kialakítása az adatfeldolgozástól a predikciók kiértékeléséig.
 
-## 🚀 Funkciók
+## 🔧 Fő funkciók
 
-- LSTM-alapú regressziós modell hőmérséklet-előrejelzésre
+- LSTM-alapú regressziós modell hőmérséklet-előrejelzéshez
 - Adatfeldolgozás `pandas` és `scikit-learn` segítségével
-- Modell mentés és verziókezelés **MLflow**-val
-- REST API szolgáltatás FastAPI segítségével
-- Streamlit dashboard az előrejelzések és metrikák megjelenítésére
-- EvidentlyAI alapú drift detektálás
-- Automatikus újratanítás **Airflow** DAG segítségével
-- Docker alapú környezet minden komponenshez
+- Modell mentése és verziókezelése **MLflow**-val
+- REST API szolgáltatás **FastAPI**-val
+- **Streamlit** dashboard az előrejelzések és metrikák vizualizálására
+- **EvidentlyAI** alapú adatsodródás- és teljesítménymonitorozás
+- Automatizált újratanítás **Airflow DAG** használatával
+- **Docker**-alapú, moduláris konténerizált környezet
 
-## 🧠 Modell
+## 🧠 Modellfelépítés
 
-A modell egy egyszerű, 3 rétegű **LSTM** hálózat, amely egy 1 dimenziós időjárási idősor alapján becsli meg a következő időlépés hőmérsékletét.
+A modell egy többrétegű **LSTM (Long Short-Term Memory)** hálózat, amely múltbeli időjárási adatok alapján becsli meg a következő időlépés maximális hőmérsékletét.
 
-## 📁 Projekt struktúra
+## 📁 Projektstruktúra
 
 ```
 .
@@ -56,12 +56,12 @@ cd Weather-LSTM-MLSecOps
 docker-compose up --build
 ```
 
-A következő komponensek fognak elindulni:
+A következő komponensek érhetők el:
+
 - **MLflow UI**: [http://localhost:5000](http://localhost:5000)
 - **API (FastAPI)**: [http://localhost:8080/docs](http://localhost:8080/docs)
 - **Streamlit dashboard**: [http://localhost:8501](http://localhost:8501)
 - **Airflow UI**: [http://localhost:8081](http://localhost:8081)
-- **Evidently monitor**: [http://localhost:8502](http://localhost:8502) *(ha beállítottad)*
 
 ## 🔬 API példa
 
@@ -82,7 +82,8 @@ Válasz:
 
 ## 📊 Dashboard
 
-A Streamlit alkalmazás vizuálisan mutatja be:
+A Streamlit alkalmazás vizuálisan megjeleníti:
+
 - Az aktuális előrejelzést
 - A predikció és a valós érték összehasonlítását
 - Metrikákat (MAE, RMSE, R²)
@@ -90,20 +91,21 @@ A Streamlit alkalmazás vizuálisan mutatja be:
 ## 🛰️ Airflow pipeline
 
 A `retrain_pipeline.py` fájlban található DAG automatikusan:
-1. Betölti az új adatokat
-2. Előfeldolgozza azokat
-3. Újratanítja a modellt
-4. Logolja az eredményeket MLflow-ba
 
-A pipeline manuálisan is indítható az Airflow UI-ból.
+1. Betölti az új adatokat  
+2. Előfeldolgozást végez  
+3. Újratanítja a modellt  
+4. Logolja az eredményeket MLflow-ba  
+
+A pipeline manuálisan indítható az Airflow UI-ból is.
 
 ## 📈 Drift detektálás
 
-Az EvidentlyAI segítségével folyamatosan monitorozzuk az input adatok eloszlását és figyeljük az esetleges driftet.
+Az EvidentlyAI segítségével folyamatosan monitorozzuk az input adatok eloszlását, és detektáljuk az esetleges driftet a predikciós teljesítmény romlásának korai észleléséhez.
 
 ## 📜 Követelmények
 
-Ha nem Dockerrel futtatod:
+Ha nem Dockerben futtatnád:
 
 ```bash
 pip install -r requirements.txt
@@ -111,7 +113,7 @@ pip install -r requirements.txt
 
 ## 📝 Licenc
 
-MIT License. Használd, forgasd, forkold bátran!
+MIT License – szabadon használható, módosítható és terjeszthető.
 
 ---
 
@@ -123,8 +125,8 @@ MSc Data Science – Óbudai Egyetem
 
 ---
 
-## 🎯 TODO / ötletek
+## 🎯 Fejlesztési irányok
 
-- [ ] Hyperparameter tuning automatikusan (Optuna?)
-- [ ] Email/SMS alert drift esetén
-- [ ] Streamlit dark/light mód váltás
+- [ ] Hyperparameter tuning automatikusan (pl. Optuna integrációval)  
+- [ ] Értesítés emailben/SMS-ben drift esetén  
+- [ ] Streamlit sötét/világos mód váltás  
