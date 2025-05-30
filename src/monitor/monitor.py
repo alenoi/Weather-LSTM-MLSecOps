@@ -11,7 +11,7 @@ from evidently import Report
 from evidently.presets import DataDriftPreset, RegressionPreset
 
 # 2. Konfigurációs útvonalak (.env-ben is beállíthatod)
-TRAIN_CSV = os.getenv("TRAIN_DATA_PATH", "data/processed/weather_cleaned.csv")
+TRAIN_CSV = os.getenv("TRAIN_DATA_PATH", "data/processed/european_capitals_weather_combined.csv")
 PRED_CSV = os.getenv("PRED_DATA_PATH", "data/processed/predictions.csv")
 
 # 3. Oldal beállítása
