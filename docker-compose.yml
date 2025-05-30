@@ -1,61 +1,89 @@
 # Weather-LSTM-MLSecOps/docker-compose.yml
 
+# Build‐common anchor root szinten
+x-build-common: &build-common
+  args:
+    PYTHONUNBUFFERED: "1"
+
 services:
   mlflow:
     build:
-      context: ./docker/mlflow
+      context: docker/mlflow
       dockerfile: Dockerfile
+      <<: *build-common
     ports:
-      - '5000:5000'
+      - 5000:5000
     volumes:
       - mlflow_artifacts:/mlflow/artifacts
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   api:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+      <<: *build-common
     env_file: .env
     depends_on:
-      - mlflow
+      mlflow:
+        condition: service_healthy
     ports:
-      - '${API_PORT}:8080'
+      - "${API_PORT}:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   monitor:
     build:
-      context: ./docker/monitor
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/monitor/Dockerfile
+      <<: *build-common
     env_file: .env
     depends_on:
-      - mlflow
+      mlflow:
+        condition: service_started
     ports:
-      - '8501:8501'
+      - 8501:8501
+    restart: unless-stopped
+
 
   airflow:
     image: apache/airflow:2.5.0
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
     volumes:
       - ./airflow/dags:/opt/airflow/dags
-    environment:
-      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
     ports:
-      - '8085:8080'
+      - 8085:8080
+    restart: unless-stopped
+    command: ["airflow", "standalone"]
+
   notebook:
     build:
       context: .
-      dockerfile: docker/api/Dockerfile   
+      dockerfile: docker/api/Dockerfile
+      <<: *build-common
     env_file: .env
     depends_on:
-      - mlflow
+      mlflow:
+        condition: service_healthy
     ports:
-      - "8888:8888"
+      - 8888:8888
     volumes:
-      - ./:/home/jovyan/work            #
+      - ./:/home/jovyan/work
     command: >
-      /opt/conda/bin/conda run -n mlsecops
-      jupyter notebook --ip=0.0.0.0 --no-browser --allow-root --NotebookApp.token=''
-
+      conda run -n mlsecops jupyter notebook
+      --ip=0.0.0.0 --no-browser --allow-root --NotebookApp.token=''
+    restart: unless-stopped
+    profiles:
+      - dev
 
 volumes:
   mlflow_artifacts:
-
-
-
